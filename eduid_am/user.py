@@ -32,6 +32,7 @@
 # Author : Fredrik Thulin <fredrik@thulin.net>
 #
 
+from datetime import datetime
 from eduid_am.tasks import update_attributes
 
 
@@ -199,6 +200,7 @@ class User(object):
         Set the user's email addresses,
         given as a list of dictionaries with the form:
             {
+            'added_timestamp': datetime
             'email': 'johnsmith@example.com',
             'verified': False,
             }
@@ -210,18 +212,26 @@ class User(object):
         '''
         self._mongo_doc['mailAliases'] = emails
 
-    def add_verified_email(self, verified_email):
-        '''
+    def add_verified_email(self, reference, verified_email):
+        """
         Pick one email address from the user's list
         and set it as verified.
 
+        :param reference: unique reference
+        :type reference: str
         :param verified_email: the verified address
         :type verified_email: str
-        '''
+        """
+        verified_dict = {
+            'email': verified_email,
+            'verified': True,
+            'verified_timestamp': datetime.utcnow(),
+            'audit_reference': reference
+        }
         emails = self._mongo_doc['mailAliases']
         for email in emails:
             if email['email'] == verified_email:
-                email['verified'] = True
+                email.update(verified_dict)
 
     def get_nins(self):
         '''
@@ -235,7 +245,12 @@ class User(object):
     def set_nins(self, nins):
         '''
         Set the user's National Identification Numbers,
-        given as a list of strings.
+        given as a list of dicts.
+        {
+            'added_timestamp': datetime
+            'nin': '200102030405',
+            'verified': False,
+            }
         This removes any previous list
         that the user might have had.
 
@@ -254,17 +269,29 @@ class User(object):
             return True
         return False
 
-    def add_verified_nin(self, verified_nin):
-        '''
+    def add_verified_nin(self, reference, verified_nin):
+        """
         Add a verified National Identification Number to the user's list
 
+        :param reference: unique reference
+        :type  reference: str
         :param verified_nin: the verified NIN
         :type  verified_nin: str
-        '''
-        if self.has_nin():
-            self._mongo_doc['norEduPersonNIN'].append(verified_nin)
-        else:
-            self._mongo_doc['norEduPersonNIN'] = [verified_nin]
+        """
+        verified_dict = {
+            'nin': verified_nin,
+            'verified': True,
+            'verified_timestamp': datetime.utcnow(),
+            'audit_reference': reference
+        }
+        for item in self.get_nins():
+            if isinstance(item, dict):
+                if item['nin'] == verified_nin:
+                    item.update(verified_dict)
+            elif isinstance(item, str):  # Backwards compatibility
+                if item == verified_nin:
+                    self._mongo_doc['norEduPersonNIN'].remove(item)
+                    self._mongo_doc['norEduPersonNIN'].append(verified_dict)
 
     def get_addresses(self):
         '''
@@ -380,21 +407,29 @@ class User(object):
         mobiles.append(mobile)
         self.set_mobiles(mobiles)
 
-    def add_verified_mobile(self, verified_mobile):
-        '''
+    def add_verified_mobile(self, reference, verified_mobile):
+        """
         Pick one mobile phone number from the user's list
         and set it as verified.
         If it is the only mobile number the user has,
         set it as the user's primary mobile.
 
+        :param reference: unique reference
+        :type  reference: str
         :param verified_mobile: the verified mobile number
         :type  verified_mobile: str
-        '''
+        """
+        verified_dict = {
+            'mobile': verified_mobile,
+            'verified': True,
+            'verified_timestamp': datetime.utcnow(),
+            'audit_reference': reference
+        }
         mobiles = self._mongo_doc['mobile']
 
         for mobile in mobiles:
             if mobile['mobile'] == verified_mobile:
-                mobile['verified'] = True
+                mobile.update(verified_dict)
                 if len(mobiles) == 1:
                     mobile['primary'] = True
 
