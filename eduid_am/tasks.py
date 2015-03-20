@@ -208,8 +208,8 @@ class AttributeManager(Task):
         return al1_urn
 
 
-@celery.task(ignore_results=True, base=AttributeManager)
-def update_attributes(app_name, obj_id):
+@celery.task(ignore_results=True, base=AttributeManager, bind=True, max_retries=3)
+def update_attributes(self, app_name, obj_id):
     """
     Task executing on the Celery worker service as an RPC called from
     the different eduID applications.
@@ -219,11 +219,17 @@ def update_attributes(app_name, obj_id):
     :type app_name: string
     :type obj_id: string
     """
-    _update_attributes(app_name, obj_id)
+    try:
+        _update_attributes(app_name, obj_id)
+    except Exception, e:
+        retry_countdown = 300 * self.request.retries ** 2
+        logger.debug("update_attributes task retrying in {seconds} seconds, error {exc}".format(seconds=retry_countdown,
+                                                                                                exc=e.message))
+        self.retry(exc=e, countdown=retry_countdown)
 
 
-@celery.task(base=AttributeManager)
-def update_attributes_keep_result(app_name, obj_id):
+@celery.task(base=AttributeManager, bind=True, max_retries=3)
+def update_attributes_keep_result(self, app_name, obj_id):
     """
     This task is exactly the same as update_attributes, except that
     it keeps the celery results so that it can be used synchronously.
@@ -236,7 +242,13 @@ def update_attributes_keep_result(app_name, obj_id):
     :type app_name: string
     :type obj_id: string
     """
-    _update_attributes(app_name, obj_id)
+    try:
+        _update_attributes(app_name, obj_id)
+    except Exception, e:
+        retry_countdown = 1
+        logger.debug("update_attributes_keep_result task retrying in {seconds} seconds, error {exc}"
+                  .format(seconds=retry_countdown, exc=e.message))
+        self.retry(exc=e, countdown=retry_countdown)
 
 
 def _update_attributes(app_name, obj_id):
