@@ -2,7 +2,7 @@ __author__ = 'leifj'
 
 from eduid_am.celery import celery, get_attribute_manager
 from eduid_am.tasks import update_attributes
-from eduid_userdb.testing import MongoTestCase
+from eduid_am.testing import AMTestCase
 from bson import ObjectId
 
 import eduid_userdb
@@ -54,13 +54,13 @@ def plugin(db, user_id):
     return {'eduPersonPrincipalName': "%s@eduid.se" % user.uid}
 
 
-class MessageTest(MongoTestCase):
+class MessageTest(AMTestCase):
     """
     This testcase sets up an AttributeManager instance and sends a message to an internally defined plugin that
     transforms 'uid' to its urn:oid representation.
     """
     def setUp(self):
-        super(MessageTest, self).setUp(celery, get_attribute_manager)
+        super(MessageTest, self).setUp()
 
     def testMessage(self):
         """
@@ -101,5 +101,5 @@ class MessageTest(MongoTestCase):
 
         update_attributes.delay(app_name='test', obj_id = _id)
 
-        am_user = self.amdb.get_user_by_id(_id)
+        am_user = self.userdb.get_user_by_id(_id)
         self.assertEqual(am_user.eppn, 'vlindeman@eduid.se')

@@ -48,6 +48,7 @@ from copy import deepcopy
 
 from bson import ObjectId
 
+from eduid_userdb.testing import MongoTestCase
 from eduid_userdb.testing import get_two_test_users
 
 from eduid_userdb import UserDB, User
@@ -59,19 +60,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-TEST_SETTINGS = {
-            'BROKER_TRANSPORT': 'memory',
-            'BROKER_URL': 'memory://',
-            'CELERY_EAGER_PROPAGATES_EXCEPTIONS': True,
-            'CELERY_ALWAYS_EAGER': True,
-            'CELERY_RESULT_BACKEND': "cache",
-            'CELERY_CACHE_BACKEND': 'memory',
-            'MONGO_URI': self.tmp_db.get_uri(),
-            'MONGO_DBNAME': 'eduid_userdb',
-        }
-
-
-class AMTestCase(unittest.TestCase):
+class AMTestCase(MongoTestCase):
     """TestCase with an embedded MongoDB temporary instance.
 
     Each test runs on a temporary instance of MongoDB. The instance will
@@ -88,6 +77,17 @@ class AMTestCase(unittest.TestCase):
         :return:
         """
         super(AMTestCase, self).setUp()
+
+        TEST_SETTINGS = {
+                    'BROKER_TRANSPORT': 'memory',
+                    'BROKER_URL': 'memory://',
+                    'CELERY_EAGER_PROPAGATES_EXCEPTIONS': True,
+                    'CELERY_ALWAYS_EAGER': True,
+                    'CELERY_RESULT_BACKEND': "cache",
+                    'CELERY_CACHE_BACKEND': 'memory',
+                    'MONGO_URI': self.tmp_db.get_uri(),
+                    'MONGO_DBNAME': 'eduid_userdb',
+                }
 
         self.am = get_attribute_manager(celery)
 
@@ -107,9 +107,9 @@ class AMTestCase(unittest.TestCase):
 
     def tearDown(self):
         super(AMTestCase, self).tearDown()
-        for userdoc in self.amdb._get_all_userdocs():
+        for userdoc in self.userdb._get_all_userdocs():
             assert User(userdoc)
-        self.amdb._drop_whole_collection()
+        self.userdb._drop_whole_collection()
 
     def mongodb_uri(self, dbname=None):
         return self.tmp_db.get_uri(dbname=dbname)
