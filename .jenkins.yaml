@@ -1,7 +1,7 @@
 builders:
   - test
+upstream:
+  - neo4j-rest-client
+  - pyFF
 triggers:
   cron: @yearly
-  upstream:
-    - neo4j-rest-client
-    - pyFF
