@@ -1,2 +1,7 @@
 builders:
   - test
+triggers:
+  cron: @yearly
+  upstream:
+    - upstream1
+    - upstream2
