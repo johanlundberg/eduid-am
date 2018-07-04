@@ -1,7 +1,15 @@
+#docker_disable
 builders:
   - test
 upstream:
-  - neo4j-rest-client
-  - pyFF
+  - upstream1
+  - upstream2
+downstream:
+  - downstream1
 triggers:
   cron: @yearly
+slack:
+  room: "slack_room"
+  custom_message: "this is a custom message"
+  sendas: "a sender"
+jabber: "channel"
