@@ -1,15 +1,12 @@
-#docker_disable
 builders:
-  - test
+  - python
 upstream:
-  - upstream1
-  - upstream2
-downstream:
-  - downstream1
+  - eduid-userdb
 triggers:
-  cron: @yearly
+  cron: @weekly
 slack:
-  room: "slack_room"
-  custom_message: "this is a custom message"
-  sendas: "a sender"
-jabber: "channel"
+  room: "eduid-builds"
+python_module: eduid_am
+python_source_directory: ./src/
+
+
