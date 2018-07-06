@@ -9,7 +9,8 @@ slack:
 python_module: eduid_am
 python_source_directory: ./src/
 clean_workspace: true
-publish_over_ssh: pypi.sunet.se
+publish_over_ssh:
+  - pypi.sunet.se
 
 extra_jobs:
   - name: eduid-am-docker
