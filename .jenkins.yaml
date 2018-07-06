@@ -12,11 +12,15 @@ clean_workspace: true
 
 extra_jobs:
   - name: eduid-am-docker
+    builders:
+      - docker
+    docker_name: eduid/eduid-am
+    managed_scripts:
+      - docker_build_prep.sh
     triggers:
       github_push: false
     upstream:
       - eduid-am
-    builders:
-      - docker
-    docker_name: eduid/eduid-am
+    
+    
     
