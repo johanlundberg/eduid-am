@@ -3,10 +3,15 @@ builders:
 upstream:
   - eduid-userdb
 triggers:
-  cron: @weekly
+  cron: "@weekly"
 slack:
   room: "eduid-builds"
 python_module: eduid_am
 python_source_directory: ./src/
 
-
+extra_jobs:
+  - name: eduid-am-docker
+    builders:
+      - docker
+    docker_name: eduid/eduid-am
+    
