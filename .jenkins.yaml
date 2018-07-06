@@ -8,6 +8,7 @@ slack:
   room: "eduid-builds"
 python_module: eduid_am
 python_source_directory: ./src/
+clean_workspace: true
 
 extra_jobs:
   - name: eduid-am-docker
