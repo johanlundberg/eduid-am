@@ -21,6 +21,7 @@ extra_jobs:
       - docker_build_prep.sh
     triggers:
       github_push: false
+      cron: null
     upstream:
       - eduid-am
     
