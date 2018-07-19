@@ -11,10 +11,7 @@ python_source_directory: ./src/
 clean_workspace: true
 publish_over_ssh:
   - pypi.sunet.se
-environment_variables:
-  TESTVAR1: "hej hopp"
-  TESTVAR2: "mipp mapp"
-
+  
 extra_jobs:
   - name: eduid-am-docker
     builders:
@@ -25,7 +22,7 @@ extra_jobs:
       - docker_tag.sh
     triggers:
       github_push: false
-      cron: null
+      cron: ~
     upstream:
       - eduid-am
     
