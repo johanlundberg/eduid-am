@@ -20,7 +20,7 @@ extra_jobs:
       TESTVAR: "mipp-mupp"
     docker_name: eduid/eduid-am
     docker_tags:
-      - "${TESTVAR}
+      - "${TESTVAR}"
     managed_scripts:
       - docker_build_prep.sh
       - docker_tag.sh
