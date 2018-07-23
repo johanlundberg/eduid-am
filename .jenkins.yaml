@@ -11,6 +11,10 @@ python_source_directory: ./src/
 clean_workspace: true
 publish_over_ssh:
   - pypi.sunet.se
+pre_build_script:
+  - echo "pre build"
+post_build_script:
+  - echo "post build"
   
 extra_jobs:
   - name: eduid-am-docker
