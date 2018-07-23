@@ -12,7 +12,7 @@ clean_workspace: true
 publish_over_ssh:
   - pypi.sunet.se
 pre_build_script:
-  - echo "apt install xmlsec1"
+  - echo "apt-get -y install xmlsec1"
 post_build_script:
   - echo "post build"
   
