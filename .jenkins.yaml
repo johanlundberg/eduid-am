@@ -15,6 +15,8 @@ pre_build_script:
   - echo "apt-get -y install xmlsec1"
 post_build_script:
   - echo "post build"
+build_in_docker:
+  image: docker.sunet.se/sunet/docker-jenkins-job
   
 extra_jobs:
   - name: eduid-am-docker
